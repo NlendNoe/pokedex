@@ -1,0 +1,15 @@
+body{
+    box-sizing: border-box;
+    margin: 0;
+    font-family: arial;
+}
+
+
+
+.pokedex{
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 20px;
+}
