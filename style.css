@@ -4,8 +4,6 @@ body{
     font-family: arial;
 }
 
-
-
 .pokedex{
     display: flex;
     flex-wrap: wrap;
