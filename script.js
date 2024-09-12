@@ -1,47 +1,85 @@
-console.log('pokemons');
-const apiUrl = 'https://pokeapi.co/api/v2/pokemon/ditto'
-const displaPokemonLimit = 8
-let offset = 0
-// variable pour eviter les appels API simultanés 
-let loading = false
+let offset = 0; 
+const limit = 7; 
+const container = document.getElementById('pokemon-cards');
+const loadingIcon = document.getElementById('loading-icon');
+let isLoading = false; // Indicateur pour éviter plusieurs chargements simultanés
 
-// fonction pour recup les pokemons
-async function recupPokemons(limit, loading) {
-    const reponse = await fetch(`${apiUrl}?limit=${displaPokemonLimit}&offset=${offset}`)
+// Fonction pour récupérer les Pokémon depuis l'API
+async function fetchPokemon() {
+    if (isLoading) return; // Empêche les appels multiples
 
-    //Transformation de la reponse en json
-    const data = await reponse.json()
-    return data.results
+    isLoading = true; // Définir l'état de chargement
+    loadingIcon.style.display = 'block'; 
+
+    try {
+        // URL de l'API avec les paramètres offset et limit
+        const response = await fetch(`https://pokeapi.co/api/v2/pokemon?offset=${offset}&limit=${limit}`);
+        const data = await response.json();
+        
+        // Traiter chaque Pokémon reçu
+        for (let pokemon of data.results) {
+            // Récupérer les détails de chaque Pokémon pour afficher des informations supplémentaires
+            const pokemonDetails = await fetch(pokemon.url);
+            const pokemonData = await pokemonDetails.json();
+
+            createPokemonCard(pokemonData);
+        }
+
+        // Mettre à jour l'offset pour le prochain lot
+        offset += limit;
+
+    } catch (error) {
+        console.error('Erreur lors du chargement des Pokémon:', error);
+    } finally {
+
+        loadingIcon.style.display = 'none';
+        isLoading = false;
+
+        if (document.body.offsetHeight <= window.innerHeight) {
+            fetchPokemon(); // Charger un autre lot de Pokémon
+        }
+    }
 }
 
-//fonction pour recup des details sur les pokemons
-async function recupPokemonsDetail(name) {
-    const reponsePokemon = await fetch('https://pokeapi.co/api/v2/pokemon/ditto')
-    const dataPokemon = await reponsePokemon.json()
-    return dataPokemon
+// Fonction pour créer une carte Pokémon
+function createPokemonCard(pokemon) {
+    const card = document.createElement('div');
+    card.classList.add('card');
+
+    // Définir la couleur de fond selon le type du Pokémon
+    const type = pokemon.types[0].type.name;
+    card.style.backgroundColor = getTypeColor(type);
+
+    card.innerHTML = `
+        <img src="${pokemon.sprites.front_default}" alt="${pokemon.name}">
+        <p>${pokemon.name}</p>
+    `;
+
+    container.appendChild(card);
 }
 
-// fonction pour les types de pokemons
-function elementsColor(type) {
+// Fonction pour obtenir la couleur en fonction du type de Pokémon
+function getTypeColor(type) {
     const typeColors = {
-        fire: '#f08030',
-        water: '#6890f0',
-        grass: '#78c850',
-        electric: '#f8d030',
-        ice: '#98d8d8',
-        fighting: '#c03028',
-        poison: '#a040a0',
-        ground: '#e0c068',
-        flying: '#a890f0',
-        psychic: '#f85888',
-        bug: '#a8b820',
-        rock: '#b8a038',
+        fire: '#F08030',
+        water: '#6890F0',
+        grass: '#78C850',
+        electric: '#F8D030',
+        ground: '#E0C068',
+        psychic: '#F85888',
+        rock: '#B8A038',
         ghost: '#705898',
-        dragon: '#7038f8',
-        dark: '#705848',
-        steel: '#b8b8d0',
-        fairy: '#f0b6bc',
-        normal: '#a8a878'
+    };
+    return typeColors[type] || '#A8A878';
 }
-return typeColors[type] || '#a8a878'
-}
+
+// Fonction pour gérer le défilement infini
+window.addEventListener('scroll', () => {
+    if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 100 && !isLoading) {
+        // Charger un nouveau lot de Pokémon quand l'utilisateur atteint presque le bas de la page
+        fetchPokemon();
+    }
+});
+
+// Charger le premier lot de Pokémon au démarrage
+fetchPokemon();
