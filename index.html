@@ -7,13 +7,39 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div id="pokedex-container">
-        <div class="header">
-            <h1>Mon Pokédex</h1>
-            <img src="../Pokedex/pngegg.png" alt="Logo Pokemon">
+    <nav id="nav_bar">
+        <h1>Pokédex</h1>
+        
+        <div class="search">
+            <input type="search" id="searchPoke" placeholder="Rechercher un pokemon">
         </div>
+    </nav>
+    
+
+    <div id="pokemonModal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-left">
+                <img id="modal-pokemon-image" src="" alt="Pokemon Image">
+            </div>
+            <div class="modal-right">
+                <h2 id="modal-pokemon-name"></h2>
+                <p id="modal-pokemon-type"></p>
+                <p id="modal-pokemon-stats"></p>
+                <p id="modal-pokemon-attacks"></p>
+                <button id="play-sound" class="sound-button">🔊 Écouter</button>
+            </div>
+        </div>
+        <span id="closeModal" class="close">&times;</span>
+        <div class="overlay hidden"></div>
+    </div>
+    
+
+
+
+    <div id="pokedex-container">
         <div id="pokemon-cards" class="card-container"></div>
-        <div id="loading-icon" class="loading-icon">Loading...✍️</div>
+        <div id="loading-icon" class="loading-icon">Loading...</div>
+
     </div>
     <script src="script.js"></script>
 </body>
